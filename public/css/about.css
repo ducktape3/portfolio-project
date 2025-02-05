@@ -1,0 +1,170 @@
+ 
+  #about {
+    width: 100%;
+    background-color: #1c1b1b;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #about .about-title{
+    position: relative;
+    font-size: 100px;
+    font-weight: bold;
+    font-family: Oswald, sans-serif;
+    color: #00000000;
+    -webkit-text-stroke: 2px #9a7e6a;
+    margin-top: 5rem;
+  }
+  
+  /* Image Container */
+  #about .about-image {
+      position: relative;
+      width: 350px;
+      height: 550px;
+      margin: -60px auto;
+      z-index: 4;
+      overflow: hidden;
+      border-radius: 10px;
+  }
+
+  #about .about-image img {
+      width: 230%;
+      height: 230%;
+      transform: translate(-220px, -370px);
+      object-fit: contain;
+      /* border-radius: 50px; */
+  }
+
+  #about .about-text {
+      position: relative;
+      z-index: 1;
+  }
+
+  /* Name Styling */
+  #about .about-text h1 {
+      font-size: 200px;
+      font-weight: bold;
+      line-height: 1.2;
+      color: transparent;
+      -webkit-text-stroke: 2px #ece8e7;
+      margin-bottom: 0.5rem;
+  }
+
+  /* Description */
+  #about .about-text p {
+      font-size: 1.2rem;
+      font-weight: 100;
+      max-width: 900px;
+      color: #ece8e7;
+      margin: 0px auto 2rem;
+      line-height: 2;
+  }
+
+  /* Social Links */
+  #about .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 35px;
+      align-items: center;
+      margin-top: 1rem;
+      margin-bottom: 5rem;
+      height: 100px;
+  }
+
+  #about .social-links a {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 2px solid #9a7e6a;
+      fill: #ece8e7;
+      border-radius: 50%;
+      padding: 10px;
+      cursor: none;
+      transition: 0.3s ease-in-out;
+  }
+
+  #about .social-links a svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+  }
+
+  #about .social-links a:hover {
+      background-color: #ece8e7;
+  }
+
+  #about .social-links a:hover svg {
+      fill: #9a7e6a;
+  }
+
+  /* Download CV Button */
+  #about .download-cv {
+      font-family: 'Oswald';
+      font-weight: 400;
+      background-color: #9a7e6a;
+      color: #ece8e7;
+      height: 60px;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.3rem;
+      cursor: none;
+      transition: 0.3s ease-in-out;
+      border-radius: 5px;
+  }
+
+  #about .download-cv:hover {
+      background-color: #ece8e7;
+      color: #9a7e6a;
+  }
+
+  #about .gaussian-blur {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: rgb(255 255 255 / 20%);
+    filter: blur(250px);
+    z-index: 0;
+  }
+
+  #about .gaussian-blur.top-right {
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+
+  #about .gaussian-blur.bottom-left {
+    bottom: 0;
+    left: 0;
+    transform: translate(-50%, 50%);
+  }
+
+  .floating-text.top-left {
+    position: absolute;
+    top: 30%;
+    left: 33%;
+    color: #cca991;
+    border: 2px solid #ece8e7;
+    font-size: 3rem;
+    pointer-events: none;
+    padding: 10px 1.5rem;
+    border-radius: 50px;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+    z-index: 5;
+  }
+
+  .floating-text.bottom-right {
+    position: absolute;
+    top: 50%;
+    left: 65%;
+    color: #cca991;
+    border: 2px solid #ece8e7;
+    font-size: 3rem;
+    pointer-events: none;
+    padding: 10px 1.5rem;
+    border-radius: 50px;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+    z-index: 5;
+  }

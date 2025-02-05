@@ -1,0 +1,77 @@
+/* Services Section */
+#services {
+    position: relative;
+    padding: 2rem 4rem;
+    margin-bottom: 5rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+#services h2 {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1c1b1b;
+    margin-top: 8rem;
+    margin-bottom: 1rem;
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.service-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid #ffd0;
+    border-radius: 25px;
+    padding: 1.5rem;
+    text-align: center;
+    /* box-shadow: 0 2px 12px rgba(var(--shadow-color), 0.2); */
+}
+
+.service-item h1 {
+    font-size: 4rem;
+    text-align: left;
+    line-height: 1;
+    margin-block: 2rem 0;
+}
+
+.service-item h3 {
+    font-size: 1.5rem;
+    text-align: left;
+    color: #658195;
+    margin-bottom: 1rem;
+}
+
+.service-item ul {
+    padding: 0 0 0 1rem;
+}
+
+.service-item li {
+    font-size: 1.2rem;
+    text-align: left;
+    font-weight: 300;
+}
+
+.service-text {
+    flex-grow: 1;
+    margin-bottom: 2rem;
+}
+
+.service-work {
+    position: relative;
+    font-size: 1.2rem;
+    margin-top: auto;
+    text-align: left;
+}
+
+.service-work a {
+    color: #766457;
+    text-decoration: none;
+    cursor: none;
+}

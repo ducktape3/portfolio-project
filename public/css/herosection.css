@@ -1,0 +1,100 @@
+/* Hero Section */
+#hero {
+  position: relative;
+  height: 950px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Ensure content stays within the container */
+}
+
+.hero-container {
+position: relative;
+width: 100%;
+height: 100%;
+}
+
+.hero-back-layer {
+position: absolute;
+top: 48%;
+left: 35%;
+transform: translate(-50%, -50%);
+z-index: 1;
+}
+
+.hero-circle {
+width: 890px;
+height: 890px;
+border: 2px solid rgba(var(--primary-color));
+border-radius: 50%;
+}
+
+.hero-middle-layer {
+position: absolute;
+top: 48%;
+right: 66%;
+transform: translateY(-50%);
+z-index: 2;
+}
+
+.hero-middle-layer img {
+width: 440px;
+height: 760px;
+object-fit: cover;
+}
+
+.hero-front-layer {
+position: absolute;
+top: 46%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 3;
+width: 1100px;
+height: 600px;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: rgba(var(--background-color), 0.9);
+box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.2);
+overflow: hidden; /* Ensure the iframe fits within the container */
+}
+
+.hero-icons-row {
+position: absolute;
+top: 50%;
+right: 5%;
+transform: translateY(-50%);
+z-index: 8;
+}
+
+.hero-icons-row a {
+display: block;
+padding: 0;
+}
+
+.hero-icons {
+padding: 0 0px;
+rotate: 270deg;
+display: flex;
+justify-content: center;
+align-items: center;
+width: 48px; 
+height: 80px;
+}
+
+.hero-icons svg {
+fill: #9a7e6a;
+cursor: none;
+}
+
+.hero-content {
+width: 100%;
+height: 100%;
+}
+
+.hero-content iframe {
+width: 100%;
+height: 100%;
+border: none;
+}

@@ -1,0 +1,115 @@
+/* Skills Section */
+#skills {
+  width: 100%;
+  background-color: #9a7e6a;
+  padding: 4rem 4rem;
+}
+
+#skills h2 {
+  text-align: left;
+  font-size: 8.125rem;
+  line-height: 1;
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+  color: #00000000;
+  -webkit-text-stroke: 2px #ece8e7;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+  justify-items: center;
+  align-content: center;
+}
+
+.skill-item {
+  text-align: center;
+  width: 210px;
+  margin-bottom: 2rem;
+}
+
+.skill-box {
+  background-color: #cca991;
+  /* color: #555; */
+  height: 160px;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 12px #aaaaaa75;
+  transition: background-color 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+  opacity: 1;
+}
+
+.skill-box:hover {
+  background-color: #766457;
+  border-color: rgba(var(--primary-color));
+  color: rgba(var(--light-color));
+  /* opacity: 1; */
+  filter: grayscale(0%);
+}
+
+.skill-box:hover svg {
+  width: 90px;
+  fill: rgba(var(--primary-color));
+  /* transform: scale(1); */
+  filter: grayscale(0);
+  transition: 0.5s ease;
+}
+
+.skill-box svg {
+  height: 90px;
+  width: 70px;
+  margin: 15px 0;
+  filter: grayscale(80%);
+  transition: fill 0.5s ease, transform 0.5s ease;
+}
+
+.skill-indicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.skill-indicator .indicator-box {
+  width: 10px;
+  height: 10px;
+  margin: 0 2px;
+  background-color: black;
+  transition: background-color 0.3s ease;
+}
+
+.skill-indicator .indicator-box.active {
+  background-color: #ece8e7;
+}
+
+.skill-indicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.skill-indicator div {
+  width: 10px;
+  height: 10px;
+  margin: 0 2px;
+  background-color: #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.skill-text {
+  margin-top: 1.5rem;
+  font-weight: 300;
+  font-size: 1.6rem;
+  color: #ececec;
+}
+
+#skills p {
+  color: #ececec;
+  font-size: 1.3rem;
+  font-weight: 100;
+  text-align: center;
+  margin: 5rem 0;
+}

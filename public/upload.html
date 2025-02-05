@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Work</title>
+</head>
+<body>
+    <h1>Upload Work</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="text" id="title" placeholder="Title" required><br>
+        <input type="text" id="description" placeholder="Description" required><br>
+        <input type="text" id="link" placeholder="Link" required><br>
+        <select id="category" required>
+            <option value="" disabled selected>Select Category</option>
+            <option value="Web Dev">Web Dev</option>
+            <option value="Graphic Design">Graphic Design</option>
+            <option value="Animation">Animation</option>
+            <option value="Game Dev">Game Dev</option>
+        </select><br>
+        <input type="text" id="imageUrl" placeholder="Image URL" required><br>
+        <div id="dropZone" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
+            Drag & Drop Image Here
+        </div><br>
+        <input type="file" id="fileInput" name="file" style="display: none;">
+        <button type="button" id="fileButton">Attach File</button><br>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Gallery</h2>
+    <div id="gallery"></div>
+
+    <script>
+        async function fetchWorks() {
+            const response = await fetch('/works');
+            const works = await response.json();
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            works.forEach(work => {
+                const workItem = document.createElement('div');
+                workItem.innerHTML = `
+                    <h3>${work.title}</h3>
+                    <p>${work.description}</p>
+                    <a href="${work.link}" target="_blank">View Work</a>
+                    <img src="${work.imageUrl}" alt="${work.title}" width="100">
+                    <button onclick="deleteWork('${work.title}')">Delete</button>
+                `;
+                gallery.appendChild(workItem);
+            });
+        }
+
+        async function deleteWork(title) {
+            const response = await fetch('/delete-work', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title })
+            });
+            if (response.ok) {
+                alert('Work deleted successfully');
+                fetchWorks();
+            } else {
+                alert('Failed to delete work');
+            }
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileButton = document.getElementById('fileButton');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#000';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#ccc';
+        });
+
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ccc';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                await uploadFile(files[0]);
+            }
+        });
+
+        fileButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async () => {
+            if (fileInput.files.length > 0) {
+                await uploadFile(fileInput.files[0]);
+            }
+        });
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/upload-file', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('imageUrl').value = data.fileUrl;
+                alert('File uploaded successfully');
+            } else {
+                alert('Failed to upload file');
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(document.getElementById('uploadForm'));
+            const response = await fetch('/upload-work', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('Work uploaded successfully');
+                fetchWorks();
+            } else {
+                alert('Failed to upload work');
+            }
+        });
+
+        fetchWorks();
+    </script>
+</body>
+</html>

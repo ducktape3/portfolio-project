@@ -1,0 +1,19 @@
+.cursor {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Make it circular */
+    background: rgba(255, 255, 255, 1); /* Semi-transparent white */
+    pointer-events: none; /* Ensure the cursor doesn't interfere with clicks */
+    transform: translate(-50%, -50%); /* Center the cursor */
+    transition: width 0.2s ease, height 0.2s ease, transform 0.1s ease;
+    z-index: 10001;
+    mix-blend-mode: difference; /* Apply negative effect */
+  }
+  
+  a:hover ~ .cursor,
+button:hover ~ .cursor,
+input:hover ~ .cursor {
+  width: 25px;
+  height: 25px;
+}
