@@ -65,6 +65,25 @@
   /* Firefox */
 }
 
+.scrollable-gallery h3 {
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.scrollable-gallery p {
+  font-weight: 200;
+}
+
+.scrollable-gallery a {
+  text-decoration: none;
+  color: #b0b0b0;
+  cursor: none;
+}
+
+.scrollable-gallery a :hover {
+  color: rgb(154, 126, 106);
+}
+
 .scrollable-gallery::-webkit-scrollbar {
   display: none;
   /* Safari and Chrome */
