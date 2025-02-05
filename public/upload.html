@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Work</title>
 </head>
+
 <body>
     <h1>Upload Work</h1>
     <form id="uploadForm" enctype="multipart/form-data">
@@ -18,20 +20,14 @@
             <option value="Animation">Animation</option>
             <option value="Game Dev">Game Dev</option>
         </select><br>
-        
-        <!-- Image Preview -->
+
         <img id="imagePreview" src="" style="display:none; width: 100px;"><br>
-        
-        <!-- Drag & Drop File Upload -->
-        <div id="dropZone" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
-            Drag & Drop Image Here
-        </div><br>
-        
-        <input type="file" id="fileInput" name="file" style="display: none;">
-        <button type="button" id="fileButton">Attach File</button><br>
-        
+
+        <input type="file" id="fileInput" name="file" accept="image/*,video/*" required><br>
+
         <button type="submit">Upload</button>
     </form>
+
 
     <h2>Gallery</h2>
     <div id="gallery"></div>
@@ -132,11 +128,18 @@
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData(document.getElementById('uploadForm'));
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('link', document.getElementById('link').value);
+            formData.append('category', document.getElementById('category').value);
 
-            // Attach the image URL from uploaded file
-            if (imagePreview.src) {
-                formData.append('imageUrl', imagePreview.src);
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]); // ✅ Attach the selected file
+            } else {
+                alert("Please select a file before uploading.");
+                return;
             }
 
             const response = await fetch('/upload-work', {
@@ -146,14 +149,15 @@
 
             if (response.ok) {
                 alert('Work uploaded successfully');
-                fetchWorks();
             } else {
                 alert('Failed to upload work');
             }
         });
 
+
         // Load Works on Page Load
         fetchWorks();
     </script>
 </body>
+
 </html>

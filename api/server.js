@@ -1,125 +1,104 @@
+require('dotenv').config();
 const express = require('express');
-const fs = require('fs');
+const mongoose = require('mongoose');
 const multer = require('multer');
-const path = require('path');
-const bodyParser = require('body-parser');
-const app = express();
-const PORT = 3000;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+const cors = require('cors');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
 
-const worksFilePath = './works.json';
-const uploadsDir = path.join(__dirname, 'uploads');
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Ensure the uploads directory exists
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-}
-
-// Multer Configuration for File Uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Multer Storage Setup (Uploads to Cloudinary)
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'portfolio_uploads',
+        resource_type: 'auto',  // ✅ Allows both images & videos
+        allowed_formats: ['jpg', 'jpeg', 'png', 'mp4', 'mov', 'avi']
+    }
+});
 const upload = multer({ storage });
 
-// 🟢 Get all works
-app.get('/works', (req, res) => {
-    fs.readFile(worksFilePath, (err, data) => {
-        if (err) {
-            return res.status(500).send('Error reading works file');
-        }
-        res.send(JSON.parse(data));
-    });
-});
 
-// 🟢 Upload a Work (With File Upload)
-app.post('/upload-work', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded');
+// Define MongoDB Schema & Model
+const WorkSchema = new mongoose.Schema({
+    title: String,
+    description: String,
+    link: String,
+    category: String,
+    imageUrl: String
+});
+const Work = mongoose.model('Work', WorkSchema);
+
+// 🟢 Get All Works
+app.get('/works', async (req, res) => {
+    try {
+        const works = await Work.find();
+        res.json(works);
+    } catch (err) {
+        res.status(500).send('Error fetching works');
     }
-
-    const newWork = {
-        title: req.body.title,
-        description: req.body.description,
-        link: req.body.link,
-        category: req.body.category,
-        imageUrl: `/uploads/${req.file.filename}`  // Save file path
-    };
-
-    fs.readFile(worksFilePath, (err, data) => {
-        if (err) {
-            return res.status(500).send('Error reading works file');
-        }
-
-        const works = JSON.parse(data);
-        works.push(newWork);
-
-        fs.writeFile(worksFilePath, JSON.stringify(works, null, 2), (err) => {
-            if (err) {
-                return res.status(500).send('Error writing to works file');
-            }
-            res.send('Work uploaded successfully');
-        });
-    });
 });
 
-// 🟢 Upload a File (Drag & Drop or File Picker)
-app.post('/upload-file', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded');
+// 🟢 Upload Work (Image Goes to Cloudinary)
+app.post('/upload-work', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send('No file uploaded');
+        }
+
+        const newWork = new Work({
+            title: req.body.title,
+            description: req.body.description,
+            link: req.body.link,
+            category: req.body.category,
+            imageUrl: req.file.path // ✅ Cloudinary URL
+        });
+
+        await newWork.save();
+        res.send('Work uploaded successfully');
+    } catch (err) {
+        res.status(500).send('Error uploading work');
     }
-    res.json({ fileUrl: `/uploads/${req.file.filename}` });
 });
 
-// 🟢 Delete a Work (Delete Only One Work and Its File)
-app.delete('/delete-work', express.json(), (req, res) => {
-    const { title } = req.body;
 
-    fs.readFile(worksFilePath, (err, data) => {
-        if (err) {
-            return res.status(500).send('Error reading works file');
+// 🟢 Delete a Work and Its Image
+app.delete('/delete-work', async (req, res) => {
+    try {
+        const { title } = req.body;
+        const work = await Work.findOneAndDelete({ title });
+
+        if (work) {
+            // Delete image from Cloudinary
+            const publicId = work.imageUrl.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId);
         }
 
-        let works = JSON.parse(data);
-        const workToDelete = works.find(work => work.title === title);
-
-        if (!workToDelete) {
-            return res.status(404).send('Work not found');
-        }
-
-        // Remove the work from the JSON file
-        works = works.filter(work => work.title !== title);
-
-        fs.writeFile(worksFilePath, JSON.stringify(works, null, 2), (err) => {
-            if (err) {
-                return res.status(500).send('Error writing to works file');
-            }
-
-            // Delete the associated file (if exists)
-            if (workToDelete.imageUrl) {
-                const filePath = path.join(__dirname, workToDelete.imageUrl);
-                fs.unlink(filePath, (err) => {
-                    if (err && err.code !== 'ENOENT') {
-                        console.error('Error deleting file:', err);
-                    }
-                });
-            }
-
-            res.send('Work deleted successfully');
-        });
-    });
+        res.send('Work deleted successfully');
+    } catch (err) {
+        res.status(500).send('Error deleting work');
+    }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
