@@ -98,8 +98,8 @@
       fill: #9a7e6a;
   }
 
-  /* Download CV Button */
-  #about .download-cv {
+  /* Download resume Button */
+  #about .download-resume {
       font-family: 'Oswald';
       font-weight: 400;
       background-color: #9a7e6a;
@@ -113,7 +113,7 @@
       border-radius: 5px;
   }
 
-  #about .download-cv:hover {
+  #about .download-Resume:hover {
       background-color: #ece8e7;
       color: #9a7e6a;
   }
