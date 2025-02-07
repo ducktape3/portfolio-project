@@ -28,101 +28,73 @@
         <button type="submit">Upload</button>
     </form>
 
-
     <h2>Gallery</h2>
     <div id="gallery"></div>
 
     <script>
         // Fetch and Display Works
         async function fetchWorks() {
-            const response = await fetch('/works');
-            const works = await response.json();
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            works.forEach(work => {
-                const workItem = document.createElement('div');
-                workItem.innerHTML = `
-                    <h3>${work.title}</h3>
-                    <p>${work.description}</p>
-                    <a href="${work.link}" target="_blank">View Work</a>
-                    <img src="${work.imageUrl}" alt="${work.title}" width="100">
-                    <button onclick="deleteWork('${work.title}', '${work.imageUrl}')">Delete</button>
-                `;
-                gallery.appendChild(workItem);
-            });
+            try {
+                const response = await fetch('/works');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch works');
+                }
+                const works = await response.json();
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = '';
+                works.forEach(work => {
+                    const workItem = document.createElement('div');
+                    workItem.innerHTML = `
+                        <h3>${work.title}</h3>
+                        <p>${work.description}</p>
+                        <a href="${work.link}" target="_blank">View Work</a>
+                        <img src="${work.imageUrl}" alt="${work.title}" width="100">
+                        <button onclick="deleteWork('${work.title}', '${work.imageUrl}')">Delete</button>
+                    `;
+                    gallery.appendChild(workItem);
+                });
+            } catch (error) {
+                console.error('Error fetching works:', error);
+                alert('Failed to fetch works');
+            }
         }
 
         // Delete a Work and Its Image
         async function deleteWork(title, imageUrl) {
-            const response = await fetch('/delete-work', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, imageUrl }) // Send image URL too
-            });
-            if (response.ok) {
-                alert('Work deleted successfully');
-                fetchWorks();
-            } else {
+            try {
+                const response = await fetch('/delete-work', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, imageUrl })
+                });
+                if (response.ok) {
+                    alert('Work deleted successfully');
+                    fetchWorks();
+                } else {
+                    alert('Failed to delete work');
+                }
+            } catch (error) {
+                console.error('Error deleting work:', error);
                 alert('Failed to delete work');
             }
         }
 
         // File Upload Elements
-        const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
-        const fileButton = document.getElementById('fileButton');
         const imagePreview = document.getElementById('imagePreview');
 
-        // Drag & Drop File Upload
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#000';
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.borderColor = '#ccc';
-        });
-
-        dropZone.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#ccc';
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                await uploadFile(files[0]);
-            }
-        });
-
-        // Click to Select File
-        fileButton.addEventListener('click', () => {
-            fileInput.click();
-        });
-
         // File Selection Event
-        fileInput.addEventListener('change', async () => {
+        fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
-                await uploadFile(fileInput.files[0]);
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
             }
         });
-
-        // Upload File and Update Image Preview
-        async function uploadFile(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const response = await fetch('/upload-file', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                imagePreview.src = data.fileUrl;
-                imagePreview.style.display = 'block';
-                alert('File uploaded successfully');
-            } else {
-                alert('Failed to upload file');
-            }
-        }
 
         // Form Submission with File Upload
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
@@ -134,26 +106,36 @@
             formData.append('link', document.getElementById('link').value);
             formData.append('category', document.getElementById('category').value);
 
-            const fileInput = document.getElementById('fileInput');
             if (fileInput.files.length > 0) {
-                formData.append('file', fileInput.files[0]); // ✅ Attach the selected file
+                formData.append('file', fileInput.files[0]); // Attach the selected file
             } else {
                 alert("Please select a file before uploading.");
                 return;
             }
 
-            const response = await fetch('/upload-work', {
-                method: 'POST',
-                body: formData
-            });
+            console.log('FormData:', formData); // Debugging
 
-            if (response.ok) {
-                alert('Work uploaded successfully');
-            } else {
+            try {
+                const response = await fetch('/upload-work', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Upload response:', data); // Debugging
+                    alert('Work uploaded successfully');
+                    fetchWorks(); // Refresh gallery after upload
+                } else {
+                    const errorData = await response.json();
+                    console.error('Upload failed:', errorData); // Debugging
+                    alert('Failed to upload work');
+                }
+            } catch (error) {
+                console.error('Error uploading work:', error); // Debugging
                 alert('Failed to upload work');
             }
         });
-
 
         // Load Works on Page Load
         fetchWorks();

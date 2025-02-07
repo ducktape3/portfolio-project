@@ -31,12 +31,11 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'portfolio_uploads',
-        resource_type: 'auto',  // ✅ Allows both images & videos
+        resource_type: 'auto',
         allowed_formats: ['jpg', 'jpeg', 'png', 'mp4', 'mov', 'avi']
     }
 });
 const upload = multer({ storage });
-
 
 // Define MongoDB Schema & Model
 const WorkSchema = new mongoose.Schema({
@@ -48,7 +47,7 @@ const WorkSchema = new mongoose.Schema({
 });
 const Work = mongoose.model('Work', WorkSchema);
 
-// 🟢 Get All Works
+// Get All Works
 app.get('/works', async (req, res) => {
     try {
         const works = await Work.find();
@@ -58,11 +57,11 @@ app.get('/works', async (req, res) => {
     }
 });
 
-// 🟢 Upload Work (Image Goes to Cloudinary)
+// Upload Work (Image Goes to Cloudinary)
 app.post('/upload-work', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).send('No file uploaded');
+            return res.status(400).json({ message: 'No file uploaded' });
         }
 
         const newWork = new Work({
@@ -70,25 +69,23 @@ app.post('/upload-work', upload.single('file'), async (req, res) => {
             description: req.body.description,
             link: req.body.link,
             category: req.body.category,
-            imageUrl: req.file.path // ✅ Cloudinary URL
+            imageUrl: req.file.path
         });
 
         await newWork.save();
-        res.send('Work uploaded successfully');
+        res.json({ message: 'Work uploaded successfully', work: newWork });
     } catch (err) {
-        res.status(500).send('Error uploading work');
+        res.status(500).json({ message: 'Error uploading work', error: err.message });
     }
 });
 
-
-// 🟢 Delete a Work and Its Image
+// Delete a Work and Its Image
 app.delete('/delete-work', async (req, res) => {
     try {
         const { title } = req.body;
         const work = await Work.findOneAndDelete({ title });
 
         if (work) {
-            // Delete image from Cloudinary
             const publicId = work.imageUrl.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(publicId);
         }

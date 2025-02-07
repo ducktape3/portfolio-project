@@ -41,26 +41,42 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 async function fetchWorks(category = 'all') {
-    const response = await fetch('/works');
-    const works = await response.json();
-    const workGallery = document.getElementById('workGallery');
-    workGallery.innerHTML = '';
-    works.forEach(work => {
-        if (category === 'all' || work.category === category) {
-            const workItem = document.createElement('div');
-            workItem.classList.add('item');
-            workItem.setAttribute('data-category', work.category);
-            workItem.innerHTML = `
-                <img src="${work.imageUrl}" alt="${work.title}">
-                <div class="item-info">
-                    <h3>${work.title}</h3>
-                    <p>${work.description}</p>
-                    <a href="${work.link}" target="_blank">View Work</a>
-                </div>
-            `;
-            workGallery.appendChild(workItem);
+    try {
+        const response = await fetch('/works');
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch works');
         }
-    });
+
+        const works = await response.json();
+        const workGallery = document.getElementById('workGallery');
+
+        if (!workGallery) {
+            console.error('Error: #workGallery not found in index.html');
+            return;
+        }
+
+        workGallery.innerHTML = ''; // Clear previous works
+
+        works.forEach(work => {
+            if (category === 'all' || work.category === category) {
+                const workItem = document.createElement('div');
+                workItem.classList.add('item');
+                workItem.setAttribute('data-category', work.category);
+                workItem.innerHTML = `
+                    <img src="${work.imageUrl}" alt="${work.title}">
+                    <div class="item-info">
+                        <h3>${work.title}</h3>
+                        <p>${work.description}</p>
+                        <a href="${work.link}" target="_blank">View Work</a>
+                    </div>
+                `;
+                workGallery.appendChild(workItem);
+            }
+        });
+    } catch (error) {
+        console.error('Error loading works:', error);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => fetchWorks());
